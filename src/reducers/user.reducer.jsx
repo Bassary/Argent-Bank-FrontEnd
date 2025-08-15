@@ -2,7 +2,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Charger l'état initial depuis localStorage
 const loadFromLocalStorage = () => {
   try {
     const token = localStorage.getItem('token');
@@ -28,16 +27,37 @@ const loadFromLocalStorage = () => {
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ email, password, rememberMe }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await axios.post('http://localhost:3001/api/v1/user/login', { email, password });
-      if (rememberMe) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
+        localStorage.setItem('token', response.data.body.token);
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
       return response.data;
     } catch (err) {
       return rejectWithValue("Informations non valides");
+    }
+    
+  },
+  console.log("Réponse API"),
+  console.log(localStorage.getItem('token'))
+);
+
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchUserProfile',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get('http://localhost:3001/api/v1/user/profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      localStorage.setItem('user', JSON.stringify(response.data.body)); // Adapte selon la structure de ta réponse API
+      return response.data.body;
+    } catch (err) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return rejectWithValue(err.response?.data || "Échec de chargement du profil");
     }
   }
 );
@@ -62,12 +82,21 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
         state.token = action.payload.token;
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state) => {
+        state.token = null;
+        state.user = null;
       });
   },
 });
