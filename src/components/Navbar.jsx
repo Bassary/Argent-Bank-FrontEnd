@@ -9,7 +9,7 @@ function Navbar() {
 
   useEffect(() => {
     console.log("Navbar", user)
-  }, [ user])
+  }, [user])
 
   const handleLogout = () => {
     dispatch(logout());
@@ -23,14 +23,14 @@ function Navbar() {
           src="./src/assets/argentBankLogo.png"
           alt="Argent Bank Logo"
         />
-        <h1 className="sr-only">Argent Bank</h1>
+        {/* <h1 className="sr-only">Argent Bank</h1> */}
       </Link>
       <div>
         {user ? (
           <>
-            <Link className="main-nav-item" to="/user">
+            <Link className="main-nav-item" to={`/user/`}>
               <i className="fa fa-user-circle"></i>
-              {user?.firstName}
+              {user?.userName}
             </Link>
             <Link className="main-nav-item" to="/" onClick={handleLogout}>
               <i className="fa fa-sign-out"></i>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserProfile, loginUser } from '../reducers/user.reducer';
@@ -20,12 +20,12 @@ const SignIn = () => {
     }
     setAlert(false);
     try {
-    const resultAction = await dispatch(loginUser({ email, password, rememberMe }));
-    if (loginUser.fulfilled.match(resultAction)) {
-      await dispatch(fetchUserProfile()).unwrap();
-      await navigate('/user');
+      const resultAction = await dispatch(loginUser({ email, password, rememberMe }));
+      if (loginUser.fulfilled.match(resultAction)) {
+        await dispatch(fetchUserProfile()).unwrap();
+        await navigate(`/user/`);
       }
-    } catch (err)  {
+    } catch (err) {
       console.log("Erreur de connexion:", err)
     }
   };
@@ -44,7 +44,7 @@ const SignIn = () => {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-              if (alert) setAlert(false)
+                if (alert) setAlert(false)
               }}
             />
           </div>
@@ -56,7 +56,7 @@ const SignIn = () => {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-              if (alert) setAlert(false)
+                if (alert) setAlert(false)
               }}
             />
           </div>

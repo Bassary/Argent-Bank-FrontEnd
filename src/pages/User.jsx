@@ -1,14 +1,25 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 
 function User() {
-const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  const [isEditing, setIsEditing] = useState(false)
 
-    return (
-        <main className="main bg-dark">
+  const handleEdit = (e) => {
+    e.preventDefault();
+    setIsEditing(!isEditing)
+  }
+
+  return (
+    <main className="main bg-dark">
       <div className="header">
         <h1>Welcome back<br />{user?.firstName} {user?.lastName}</h1>
-        <button className="edit-button">Edit Name</button>
+        <Link to={`/user/edit`}>
+          <button className="edit-button" onChange={handleEdit}>Edit Name</button>
+        </Link>
+
       </div>
       <h2 className="sr-only">Accounts</h2>
       <section className="account">
@@ -42,7 +53,7 @@ const { user } = useSelector((state) => state.auth);
         </div>
       </section>
     </main>
-    )
+  )
 }
 
 export default User

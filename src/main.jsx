@@ -8,20 +8,20 @@ import './axiosConfig.js'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from './reducers/user.reducer.jsx'
-// import rootReducer from "./reducers/index.jsx"
 
-export const store =  configureStore({
+
+export const store = configureStore({
   reducer: {
     auth: authReducer,
   },
-  devTools: true, 
+  devTools: true,
   // changer en false une fois en production
 })
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <BrowserRouter>
-    <App />
-  </BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>
 )

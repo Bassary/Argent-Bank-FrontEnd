@@ -30,15 +30,15 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await axios.post('http://localhost:3001/api/v1/user/login', { email, password });
-        localStorage.setItem('token', response.data.body.token);
-        if (response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-        }
+      localStorage.setItem('token', response.data.body.token);
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
       return response.data;
     } catch (err) {
       return rejectWithValue("Informations non valides");
     }
-    
+
   },
   console.log("Réponse API"),
   console.log(localStorage.getItem('token'))
@@ -52,7 +52,7 @@ export const fetchUserProfile = createAsyncThunk(
       const response = await axios.get('http://localhost:3001/api/v1/user/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      localStorage.setItem('user', JSON.stringify(response.data.body)); // Adapte selon la structure de ta réponse API
+      localStorage.setItem('user', JSON.stringify(response.data.body));
       return response.data.body;
     } catch (err) {
       localStorage.removeItem('token');
@@ -61,6 +61,32 @@ export const fetchUserProfile = createAsyncThunk(
     }
   }
 );
+
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateUserProfile',
+  async (userData, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.put(
+        'http://localhost:3001/api/v1/user/profile',
+        userData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const user = response.data.user || response.data.body;
+      // console.log("Réponse API update:", err.response?.user)
+      localStorage.setItem('user', JSON.stringify(user));
+      // return response.data.user;
+      // return await dispatch(fetchUserProfile()).unwrap();
+      return user;
+    } catch (err) {
+      console.log("Erreur API update:", err.response?.user)
+      return rejectWithValue(err.response?.data?.message || "Échec de la mise à jour du profil");
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -97,6 +123,13 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state) => {
         state.token = null;
         state.user = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        console.log("Payload reçu dans le reducer:", action.payload)
+        state.user = action.payload;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });
