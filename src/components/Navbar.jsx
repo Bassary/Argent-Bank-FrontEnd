@@ -20,7 +20,7 @@ function Navbar() {
       <Link className="main-nav-logo" to="/">
         <img
           className="main-nav-logo-image"
-          src="./src/assets/argentBankLogo.png"
+          src="assets/argentBankLogo.png"
           alt="Argent Bank Logo"
         />
         {/* <h1 className="sr-only">Argent Bank</h1> */}
